@@ -227,15 +227,6 @@ Cocci.Dessin = (function () {
 
   /* ---------- Les stades de croissance ---------- */
 
-  // Mélange deux couleurs hexadécimales (dose = part de la couleur a)
-  function melanger(a, b, dose) {
-    var ca = canaux(a), cb = canaux(b);
-    return '#' + ca.map(function (v, i) {
-      var m = Math.round(v * dose + cb[i] * (1 - dose));
-      return (m < 16 ? '0' : '') + m.toString(16);
-    }).join('');
-  }
-
   var OMBRE_SOL = '<ellipse cx="69" cy="168" rx="38" ry="6" fill="black" opacity="0.12"/>';
 
   // Œuf : aucun indice, les gènes sont cachés
@@ -250,68 +241,20 @@ Cocci.Dessin = (function () {
       '<ellipse cx="54" cy="78" rx="8" ry="15" transform="rotate(20 54 78)" fill="white" opacity="0.7"/>');
   }
 
-  // Larve : corps sombre en segments, avec des taches de la couleur de la carapace (l'indice)
-  function larve(genes, options) {
-    options = options || {};
-    var indice = G.gene('carapace', genes.carapace).couleur;
-    var largeurs = [22, 27, 29, 29, 27, 23, 17, 11];
-    var corps = CONFIG.COULEUR_LARVE;
-    var dessin = OMBRE_SOL;
-
-    // pattes sur les 3 premiers segments
-    dessin += '<g stroke="' + CONFIG.COULEUR_CORPS + '" stroke-width="4" stroke-linecap="round">';
-    for (var p = 0; p < 3; p++) {
-      var yp = 58 + p * 14, rp = largeurs[p];
-      dessin += '<path d="M' + (69 - rp) + ' ' + yp + 'L' + (69 - rp - 12) + ' ' + (yp + 6) + '"/>' +
-                '<path d="M' + (69 + rp) + ' ' + yp + 'L' + (69 + rp + 12) + ' ' + (yp + 6) + '"/>';
-    }
-    dessin += '</g>';
-
-    // segments, du bas vers le haut pour qu'ils se chevauchent bien
-    for (var i = largeurs.length - 1; i >= 0; i--) {
-      dessin += '<ellipse cx="69" cy="' + (58 + i * 14) + '" rx="' + largeurs[i] + '" ry="10" fill="' + corps + '"/>' +
-                '<ellipse cx="69" cy="' + (55 + i * 14) + '" rx="' + (largeurs[i] - 6) + '" ry="4" fill="white" opacity="0.08"/>';
-    }
-    // taches indices
-    [[1, 13, 5], [3, 16, 6], [3, 0, 4], [5, 11, 4.5]].forEach(function (t) {
-      var y = 58 + t[0] * 14;
-      dessin += '<circle cx="' + (69 - t[1]) + '" cy="' + y + '" r="' + t[2] + '" fill="' + indice + '"/>';
-      if (t[1]) dessin += '<circle cx="' + (69 + t[1]) + '" cy="' + y + '" r="' + t[2] + '" fill="' + indice + '"/>';
-    });
-    // tête
-    dessin += '<ellipse cx="69" cy="40" rx="14" ry="11" fill="' + CONFIG.COULEUR_CORPS + '"/>' +
-              '<path d="M62 32 Q58 24 54 22 M76 32 Q80 24 84 22" stroke="' + CONFIG.COULEUR_CORPS + '" stroke-width="3" stroke-linecap="round" fill="none"/>';
-
-    return cadre(options.taille || 120, 'Larve de coccinelle', dessin);
-  }
-
-  // Nymphe : forme arrondie, couleur adoucie (on la devine)
-  function nymphe(genes, options) {
-    options = options || {};
-    var vraie = G.gene('carapace', genes.carapace).couleur;
-    var couleur = melanger(vraie, CONFIG.COULEUR_NYMPHE_FOND, CONFIG.DOSAGE_COULEUR_NYMPHE);
-    var fonce = melanger(couleur, '#000000', 0.8);
-    return cadre(options.taille || 120, 'Nymphe de coccinelle',
-      OMBRE_SOL +
-      '<ellipse cx="69" cy="160" rx="11" ry="7" fill="' + fonce + '"/>' +
-      '<ellipse cx="69" cy="147" rx="19" ry="9" fill="' + fonce + '"/>' +
-      '<ellipse cx="69" cy="132" rx="27" ry="11" fill="' + fonce + '"/>' +
-      '<ellipse cx="69" cy="88" rx="40" ry="46" fill="' + couleur + '"/>' +
-      '<path d="M33 108 Q69 124 105 108" stroke="black" stroke-opacity="0.12" stroke-width="3" fill="none"/>' +
-      '<path d="M69 46 L69 104" stroke="black" stroke-opacity="0.1" stroke-width="2"/>' +
-      '<ellipse cx="52" cy="66" rx="9" ry="14" transform="rotate(25 52 66)" fill="white" opacity="0.35"/>');
-  }
+  // Petite coccinelle : exactement l'adulte, en plus petit (posée en bas du cadre)
+  var ECHELLE_PETITE = 0.7;
+  var PETITE = 'translate(' + MILIEU + ' 172) scale(' + ECHELLE_PETITE + ') translate(-' + MILIEU + ' -172)';
 
   // Dessine une coccinelle de l'élevage selon son stade
   function selonStade(c, stade, options) {
     if (stade === 'oeuf') return oeuf(options);
-    if (stade === 'larve') return larve(c.genes, options);
-    if (stade === 'nymphe') return nymphe(c.genes, options);
+    if (stade === 'petite') return coccinelle(c.genes, Object.assign({}, options, { petite: true }));
     return coccinelle(c.genes, options);
   }
 
   /* Un gène peut être absent (mission : « ? ») :
-     carapace absente → gris, motif absent → un « ? », couleur de motif absente → gris foncé */
+     carapace absente → gris, motif absent → un « ? », couleur de motif absente → gris foncé
+     options.petite : dessine la version « petite coccinelle »                            */
   function coccinelle(genes, options) {
     options = options || {};
     var uid = 'c' + (++compteur);
@@ -352,7 +295,7 @@ Cocci.Dessin = (function () {
       : '<text x="' + MILIEU + '" y="122" text-anchor="middle" font-size="54" font-weight="800" ' +
         'font-family="sans-serif" fill="white" opacity="0.85">?</text>';
 
-    var dessin =
+    var corps =
       // 1. corps
       '<path opacity="0.5" d="' + FORMES.corps + '" fill="black"/>' +
       '<path opacity="0.2" d="' + FORMES.ombreCorps + '" fill="black"/>' +
@@ -364,21 +307,49 @@ Cocci.Dessin = (function () {
       // 4. ombres et reflet
       '<path opacity="0.2" d="' + FORMES.ombreBord + '" fill="black"/>' +
       '<path opacity="0.2" d="' + FORMES.ombreCol + '" fill="black"/>' +
-      '<path opacity="0.2" d="' + FORMES.reflet + '" fill="white"/>' +
-      // 5. collerette + tête
+      '<path opacity="0.2" d="' + FORMES.reflet + '" fill="white"/>';
+    // 5. collerette + tête
+    var tete =
       '<path d="' + FORMES.collerette + '" fill="' + CONFIG.COULEUR_COLLERETTE + '"/>' +
       '<path d="' + FORMES.tete + '" fill="' + CONFIG.COULEUR_CORPS + '"/>';
 
-    var label = complet ? 'Coccinelle ' + G.nom(genes) : 'Coccinelle demandée';
+    var dessin = options.petite
+      ? '<g transform="' + PETITE + '">' + corps + tete + '</g>'
+      : corps + tete;
+
+    var label = complet ? (options.petite ? 'Petite coccinelle ' : 'Coccinelle ') + G.nom(genes) : 'Coccinelle demandée';
     return cadre(options.taille || 120, label, '<defs>' + defs + '</defs>' + dessin);
+  }
+
+  /* ---------- Mini-jeu : puceron et goutte de rosée dorée ---------- */
+
+  function puceron(taille) {
+    return '<svg viewBox="0 0 40 32" width="' + taille + '" height="' + Math.round(taille * 0.8) + '" aria-hidden="true">' +
+      '<path d="M12 25l-3 5M20 27v4M28 25l3 5" stroke="#5a9e3a" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<ellipse cx="22" cy="17" rx="14" ry="10" fill="#9fe07a"/>' +
+      '<ellipse cx="25" cy="13" rx="7" ry="3.5" fill="white" opacity="0.45"/>' +
+      '<circle cx="8" cy="13" r="6.5" fill="#7cc95a"/>' +
+      '<circle cx="6.5" cy="11.5" r="1.8" fill="#2f3a2f"/>' +
+      '<path d="M5 7 Q2 2 0 2 M9 7 Q9 2 12 1" stroke="#5a9e3a" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+
+  function goutte(taille) {
+    return '<svg viewBox="0 0 30 40" width="' + Math.round(taille * 0.75) + '" height="' + taille + '" aria-hidden="true">' +
+      '<defs><linearGradient id="goutte-or" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="#FFF3A0"/><stop offset="0.5" stop-color="#FFC301"/><stop offset="1" stop-color="#E08A00"/>' +
+      '</linearGradient></defs>' +
+      '<path d="M15 2 C15 2 3 18 3 26 A12 12 0 0 0 27 26 C27 18 15 2 15 2Z" fill="url(#goutte-or)" stroke="#B36A00" stroke-width="1.5"/>' +
+      '<ellipse cx="10" cy="24" rx="3" ry="6" fill="white" opacity="0.6" transform="rotate(20 10 24)"/>' +
+      '</svg>';
   }
 
   return {
     coccinelle: coccinelle,
     silhouette: silhouette,
     oeuf: oeuf,
-    larve: larve,
-    nymphe: nymphe,
-    selonStade: selonStade
+    selonStade: selonStade,
+    puceron: puceron,
+    goutte: goutte
   };
 })();

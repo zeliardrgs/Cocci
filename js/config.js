@@ -122,12 +122,33 @@ Cocci.CONFIG = {
   },
 
   /* ---------- CROISSANCE ----------
+     Œuf → Petite coccinelle → Adulte.
      Durée de chaque stade, en heures, selon la rareté globale du bébé.
      (En mode test, 1 heure = 1 minute.)                               */
   CROISSANCE: {
     oeuf:   { commune: 2,  peuCommune: 3,  rare: 4,  epique: 6,  legendaire: 8 },
-    larve:  { commune: 6,  peuCommune: 8,  rare: 10, epique: 12, legendaire: 16 },
-    nymphe: { commune: 16, peuCommune: 19, rare: 22, epique: 30, legendaire: 36 }
+    petite: { commune: 22, peuCommune: 27, rare: 32, epique: 42, legendaire: 52 }
+  },
+
+  /* ---------- FAIRE GRANDIR (petite coccinelle seulement) ----------
+     Prix = PRIX_PAR_HEURE pièces d'or × heures restantes (arrondi à l'heure du dessus) */
+  ACCELERATION: {
+    PRIX_PAR_HEURE: 2
+  },
+
+  /* ---------- MINI-JEU « CHASSE AUX PUCERONS » ----------
+     Les temps gagnés sont du temps de croissance (divisés par 60 en mode test,
+     comme tout le reste) ; la partie elle-même dure toujours 30 vraies secondes. */
+  MINI_JEU: {
+    DUREE_PARTIE_SECONDES: 30,
+    GAIN_PAR_PUCERON_MINUTES: 2,     // chaque puceron attrapé
+    GAIN_GOUTTE_MINUTES: 10,         // goutte de rosée dorée (rare)
+    MAX_PAR_PARTIE_MINUTES: 60,      // maximum gagné en une partie
+    DELAI_ENTRE_PARTIES_HEURES: 4,   // une même petite coccinelle rejoue 4 h plus tard
+    // Rythme de la partie
+    APPARITION_SECONDES: 0.55,       // un nouvel objet tombe toutes les 0,55 s environ
+    PROBA_GOUTTE: 0.07,              // 7 % des objets sont des gouttes dorées
+    VITESSE_CHUTE: 0.35              // part de la hauteur de l'écran parcourue par seconde
   },
 
   /* ---------- ÉCONOMIE (monnaie : pièces d'or) ---------- */
@@ -143,9 +164,20 @@ Cocci.CONFIG = {
       SAUVAGE: { prix: 30, rareteMax: 1 },
       // Coccinelle mystère : un gène de rareté garantie, les autres jusqu'à rareteMaxAutres
       MYSTERE: { prix: 120, rareteGarantie: 3, rareteMaxAutres: 3 },
-      // Place d'élevage : 100, puis +50 à chaque achat (100, 150, 200…)
-      PLACE: { prixDepart: 100, hausse: 50 }
+      // Nouvel habitat : 300, puis +200 à chaque achat (300, 500, 700…)
+      HABITAT: { prixDepart: 300, hausse: 200 }
     }
+  },
+
+  /* ---------- HABITATS ----------
+     Les œufs vont dans la nurserie. À l'éclosion, la petite coccinelle
+     s'installe dans un habitat. Pour pondre, il faut une place libre dans
+     la nurserie ET une place libre (réservée au futur bébé) dans les habitats. */
+  HABITATS: {
+    NURSERIE_PLACES: 6,     // nombre d'œufs maximum dans la nurserie
+    PLACES_PAR_HABITAT: 6,  // coccinelles par habitat
+    AU_DEPART: 1,           // habitats au début d'une partie (en plus de la nurserie)
+    VITESSE_BALADE: 0.06    // vitesse de promenade (part de la largeur de l'habitat par seconde)
   },
 
   /* ---------- MISSIONS ----------
@@ -170,7 +202,6 @@ Cocci.CONFIG = {
   /* ---------- DÉPART D'UNE NOUVELLE PARTIE ---------- */
   DEPART: {
     pieces: 50,     // pièces d'or au départ
-    places: 6,
     coccinelles: [
       { carapace: 'ruby',  motif: 'pois',    couleurMotif: 'coal' },   // rouge à pois noirs
       { carapace: 'amber', motif: 'rayures', couleurMotif: 'canari' }  // jaune à rayures (blanc → Canari)
@@ -182,9 +213,6 @@ Cocci.CONFIG = {
   COULEUR_COLLERETTE: '#EAC791',  // partie claire entre la tête et la carapace
   COULEUR_SILHOUETTE: '#cfdcc6',  // coccinelle pas encore choisie / pas découverte
   COULEUR_OEUF: '#fff1c7',
-  COULEUR_LARVE: '#4a4a55',
-  COULEUR_NYMPHE_FOND: '#d8c8a8', // la nymphe mélange sa vraie couleur avec ce beige
-  DOSAGE_COULEUR_NYMPHE: 0.55,    // 0 = tout beige, 1 = vraie couleur
   COULEUR_INCONNUE: '#c9d3c2',     // carapace « ? » sur les missions
   COULEUR_MOTIF_INCONNU: '#8b9588' // couleur de motif « ? » sur les missions
 };

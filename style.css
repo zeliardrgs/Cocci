@@ -654,3 +654,409 @@ button.porte-monnaie:focus-visible { outline: 3px solid #ffd84d; outline-offset:
 /* ---------- Pièces d'or ---------- */
 .icone-piece { display: inline-block; vertical-align: -0.2em; flex-shrink: 0; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2)); }
 .montant { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; font-weight: 800; }
+
+/* =========================================================
+   CYCLE DE VIE : œuf, petite, adulte
+   ========================================================= */
+.pastille-stade {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #e7f3df;
+  color: var(--accent-fonce);
+  border-radius: 99px;
+  padding: 2px 8px;
+}
+.carte-croissance .pastille-stade { background: #fff4d0; color: #8a6200; }
+.carte-petite { cursor: pointer; background: #fbfdf8; }
+.carte-petite .coccinelle { animation: respire 3s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes respire { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03, 0.98); } }
+.icone-jeu {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #fff;
+  border: 2px solid #9fe07a;
+  border-radius: 50%;
+}
+.pastille-stade-texte {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: #e7f3df;
+  color: var(--accent-fonce);
+  border-radius: 99px;
+  padding: 3px 10px;
+}
+.fiche-actions .aide { margin: 0; text-align: center; }
+
+/* Résumé de l'absence avec petits dessins */
+.bandeau ul { list-style: none; padding-left: 0; }
+.absence-titre { font-weight: 800; margin-top: 8px !important; }
+.absence-ligne { display: flex; align-items: center; gap: 8px; }
+.absence-ligne .coccinelle { width: auto; height: 44px; }
+
+/* =========================================================
+   RÉVÉLATION À L'ÉCLOSION
+   ========================================================= */
+.revelation { text-align: center; }
+.revelation-titre {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-fonce);
+  animation: apparition 0.4s ease-out;
+}
+.revelation-scene {
+  position: relative;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.revelation-lueur {
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--rarete) 45%, white) 0%, transparent 70%);
+  opacity: 0;
+  animation: lueur 1.6s ease-out 0.8s forwards;
+}
+.revelation-oeuf, .revelation-bebe { position: absolute; }
+.revelation-oeuf { animation: oeuf-tremble 0.9s ease-in-out forwards; }
+.revelation-bebe { opacity: 0; transform: scale(0.3); animation: bebe-apparait 0.6s cubic-bezier(.3,1.6,.5,1) 0.85s forwards; }
+.revelation h2 { margin: 4px 0; }
+.bandeau-nouveau {
+  display: inline-block;
+  margin: 8px 0;
+  padding: 6px 16px;
+  font-weight: 800;
+  color: #5a3a00;
+  background: linear-gradient(90deg, #ffe65a, #ffc301, #ffe65a);
+  border-radius: 99px;
+  box-shadow: 0 3px 10px rgba(200, 140, 0, 0.35);
+  opacity: 0;
+  animation: bandeau 0.5s ease-out 1.3s forwards;
+}
+@keyframes oeuf-tremble {
+  0%   { transform: rotate(0); opacity: 1; }
+  20%  { transform: rotate(-8deg); }
+  40%  { transform: rotate(8deg); }
+  60%  { transform: rotate(-6deg) scale(1.05); }
+  85%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+@keyframes bebe-apparait { to { opacity: 1; transform: scale(1); } }
+@keyframes lueur { 0% { opacity: 0; transform: scale(0.5); } 40% { opacity: 1; } 100% { opacity: 0.7; transform: scale(1.1); } }
+@keyframes bandeau { from { opacity: 0; transform: translateY(8px) scale(0.9); } to { opacity: 1; transform: none; } }
+
+/* =========================================================
+   MINI-JEU « CHASSE AUX PUCERONS »
+   ========================================================= */
+.chasse { width: min(480px, calc(100% - 16px)); }
+.chasse-intro { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+.chasse-regles { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.chasse-regles li { display: flex; align-items: center; gap: 8px; }
+.chasse-commandes { text-align: center; }
+.chasse-hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+.chasse-hud svg { vertical-align: middle; }
+.chasse-chrono {
+  font-weight: 800;
+  font-size: 1.2rem;
+  background: var(--texte);
+  color: #fff;
+  border-radius: 99px;
+  padding: 2px 12px;
+}
+.chasse-terrain {
+  position: relative;
+  height: min(60vh, 460px);
+  margin-bottom: 10px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(#cfeaff 0%, #e9f7dd 70%, #a9d98a 100%);
+  touch-action: none;       /* le doigt déplace la coccinelle, pas la page */
+  user-select: none;
+  cursor: ew-resize;
+}
+.chasse-joueur { position: absolute; left: 0; bottom: 4px; will-change: transform; }
+.chasse-objet { position: absolute; left: 0; top: 0; will-change: transform; pointer-events: none; }
+.chasse-goutte svg { filter: drop-shadow(0 0 6px rgba(255, 200, 0, 0.9)); }
+.chasse-bulle {
+  position: absolute;
+  transform: translateX(-50%);
+  font-weight: 800;
+  color: var(--accent-fonce);
+  pointer-events: none;
+  animation: bulle 0.7s ease-out forwards;
+}
+@keyframes bulle { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, -40px); } }
+.chasse-fin { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.chasse-fin p { margin: 2px 0; }
+.chasse-resultat { display: flex; align-items: center; gap: 6px; font-size: 1.1rem; }
+
+/* « Réduire les animations » : les nouvelles animations s'arrêtent aussi */
+@media (prefers-reduced-motion: reduce) {
+  .carte-petite .coccinelle, .revelation-titre, .chasse-bulle { animation: none; }
+  .revelation-oeuf { display: none; }
+  .revelation-bebe, .bandeau-nouveau, .revelation-lueur { animation: none; opacity: 1; transform: none; }
+}
+
+/* =========================================================
+   HABITATS
+   ========================================================= */
+.barre-outils {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.barre-outils #bouton-boutique-elevage { margin-bottom: 0; }
+.bascule {
+  display: inline-flex;
+  background: #fff;
+  border-radius: 99px;
+  padding: 3px;
+  box-shadow: var(--ombre);
+}
+.bascule-choix {
+  min-height: 40px;
+  min-width: 44px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 99px;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  color: var(--texte-doux);
+  cursor: pointer;
+}
+.bascule-choix[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.bascule-choix:focus-visible { outline: 3px solid #ffd84d; outline-offset: 1px; }
+
+.habitats { display: grid; gap: 16px; }
+@media (min-width: 900px) { .habitats { grid-template-columns: 1fr 1fr; } }
+
+.habitat {
+  margin: 0;
+  background: #fff;
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  overflow: hidden;
+}
+.habitat-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+}
+.habitat-entete h3 { margin: 0; font-size: 1rem; }
+.habitat-entete .pastille-info { background: #eef6e4; }
+
+/* La scène : un coin de jardin vu de dessus */
+.habitat-scene {
+  position: relative;
+  height: 230px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.25) 0 18%, transparent 19%),
+    radial-gradient(circle at 75% 70%, rgba(255, 255, 255, 0.18) 0 22%, transparent 23%),
+    linear-gradient(160deg, #b9e39a, #8fcf6d);
+}
+.decor { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.habitat-vide {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  font-weight: 700;
+  color: #4d7a3a;
+}
+
+/* Une coccinelle qui se promène (zone tactile 64 × 80) */
+.balade {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 64px;
+  height: 80px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  will-change: transform;
+}
+.balade-corps { display: flex; justify-content: center; will-change: transform; }
+.balade:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; border-radius: 12px; }
+.balade:hover .balade-corps .coccinelle { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)); }
+.balade-infos {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.barre-mini { width: 40px; height: 6px; margin: 0; background: rgba(255, 255, 255, 0.85); }
+.icone-jeu-mini {
+  position: static;
+  width: 22px;
+  height: 22px;
+  border-width: 1.5px;
+}
+
+/* Nurserie : les œufs posés sur une grande feuille */
+.scene-nurserie { height: 170px; background: linear-gradient(160deg, #dff1cf, #c4e5a8); }
+.nid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 10px;
+  padding: 10px;
+}
+.oeuf-nid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 56px;
+  padding: 2px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.oeuf-nid .coccinelle { animation: oeuf-berce 3s ease-in-out infinite; transform-origin: 50% 95%; }
+.oeuf-nid:nth-child(2n) .coccinelle { animation-delay: -1.5s; }
+.oeuf-nid:focus-visible { outline: 3px solid #ffd84d; }
+.suivi-mini { font-size: 0.7rem; font-weight: 800; color: #4d7a3a; }
+@keyframes oeuf-berce { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+/* Acheter un habitat */
+.habitat-acheter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 120px;
+  border: 3px dashed #b9c9b0;
+  border-radius: var(--rayon);
+  background: rgba(255, 255, 255, 0.5);
+  font: inherit;
+  font-weight: 800;
+  color: var(--accent-fonce);
+  cursor: pointer;
+}
+.habitat-acheter:hover { background: #fff; }
+.habitat-acheter-plus { font-size: 2rem; line-height: 1; }
+
+/* Fiche : où elle vit */
+.fiche-maison { margin: 8px 0 0; text-align: center; }
+.fiche-demenager { display: grid; gap: 6px; }
+.lien {
+  min-height: 44px;
+  padding: 0 8px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--accent-fonce);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oeuf-nid .coccinelle { animation: none; }
+}
+/* la nurserie grandit avec le nombre d'œufs */
+.scene-nurserie { height: auto; min-height: 170px; }
+.scene-nurserie .nid { position: relative; inset: auto; min-height: 170px; padding: 14px 10px; }
+
+/* =========================================================
+   HABITAT EN PLEINE PAGE + SÉLECTEUR
+   ========================================================= */
+.habitats { display: flex; flex-direction: column; gap: 10px; }
+@media (min-width: 900px) { .habitats { display: flex; } }
+
+.selecteur-habitat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #fff;
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  padding: 6px;
+}
+.selecteur-fleche {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1.8rem;
+  line-height: 1;
+  font-weight: 800;
+  cursor: pointer;
+}
+.selecteur-fleche:hover { background: var(--accent-fonce); }
+.selecteur-fleche:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
+.selecteur-nom { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.selecteur-nom strong { font-size: 1.1rem; }
+.selecteur-nom > span:not(.points) { font-size: 0.85rem; color: var(--texte-doux); font-weight: 700; }
+.points { display: flex; gap: 5px; margin-top: 2px; }
+.point { width: 7px; height: 7px; border-radius: 50%; background: #d4e2c9; }
+.point-actif { background: var(--accent); }
+
+/* La scène prend toute la hauteur disponible de l'écran */
+#vue-habitats .habitat-scene {
+  height: calc(100vh - 330px);
+  height: calc(100dvh - 330px);
+  min-height: 320px;
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+}
+#vue-habitats .scene-nurserie { display: flex; }
+#vue-habitats .scene-nurserie .nid { position: relative; flex: 1; min-height: 0; gap: 14px 18px; }
+.scene-achat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: linear-gradient(160deg, #eef6e4, #dcedcc);
+}
+.scene-achat .habitat-acheter { width: min(100%, 320px); min-height: 180px; font-size: 1.1rem; }
+.balade { width: 72px; height: 90px; }

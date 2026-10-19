@@ -33,9 +33,18 @@
         <h2>Mon élevage</h2>
         <span id="places-elevage" class="pastille-info"></span>
       </div>
-      <button type="button" id="bouton-boutique-elevage" class="bouton bouton-secondaire">Boutique</button>
+      <div class="barre-outils">
+        <div class="bascule" role="group" aria-label="Affichage de l'élevage">
+          <button type="button" class="bascule-choix" data-vue="habitats" aria-pressed="true">Habitats</button>
+          <button type="button" class="bascule-choix" data-vue="liste" aria-pressed="false">Liste</button>
+        </div>
+        <button type="button" id="bouton-boutique-elevage" class="bouton bouton-secondaire">Boutique</button>
+      </div>
       <p class="aide">Touche une coccinelle pour voir sa fiche.</p>
-      <div id="grille-elevage" class="grille"></div>
+      <!-- Vue « habitats » : nurserie + habitats où les coccinelles se promènent -->
+      <div id="vue-habitats" class="habitats"></div>
+      <!-- Vue « liste » : toutes les coccinelles en cartes -->
+      <div id="grille-elevage" class="grille" hidden></div>
       <button type="button" id="bouton-ajouter" class="bouton bouton-secondaire bouton-test" hidden>+ Coccinelle au hasard (mode test)</button>
     </section>
 
@@ -101,7 +110,7 @@
         <div id="nuancier-couleurs" class="grille"></div>
         <h3>Effets spéciaux et couleurs proches (contour renforcé)</h3>
         <div id="nuancier-exemples" class="grille"></div>
-        <h3>Les 4 stades</h3>
+        <h3>Les 3 stades</h3>
         <div id="nuancier-stades" class="grille"></div>
       </details>
     </section>
@@ -137,6 +146,16 @@
     <div id="boutique-contenu"></div>
   </dialog>
 
+  <!-- ===== Mini-jeu « Chasse aux pucerons » ===== -->
+  <dialog id="chasse" class="fiche chasse" aria-labelledby="chasse-titre">
+    <div id="chasse-contenu"></div>
+  </dialog>
+
+  <!-- ===== Révélation à l'éclosion ===== -->
+  <dialog id="revelation" class="fiche revelation" aria-labelledby="revelation-nom">
+    <div id="revelation-contenu"></div>
+  </dialog>
+
   <!-- Petits messages qui apparaissent en bas de l'écran -->
   <div id="annonces" class="annonces" aria-live="polite"></div>
 
@@ -145,9 +164,11 @@
   <script src="js/icones.js"></script>
   <script src="js/temps.js"></script>
   <script src="js/genetique.js"></script>
+  <script src="js/habitats.js"></script>
   <script src="js/dessin.js"></script>
   <script src="js/croissance.js"></script>
   <script src="js/economie.js"></script>
+  <script src="js/minijeu.js"></script>
   <script src="js/missions.js"></script>
   <script src="js/sauvegarde.js"></script>
   <script src="js/composants.js"></script>
@@ -156,6 +177,8 @@
   <script src="js/ecrans/missions.js"></script>
   <script src="js/ecrans/coccidex.js"></script>
   <script src="js/ecrans/boutique.js"></script>
+  <script src="js/ecrans/chasse.js"></script>
+  <script src="js/ecrans/revelation.js"></script>
   <script src="js/interface.js"></script>
   <script src="js/main.js"></script>
 </body>

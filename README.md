@@ -18,6 +18,6 @@ Toutes les valeurs d'équilibrage sont dans `js/config.js` : couleurs et rareté
 
 - `index.html`, `style.css`
 - `js/config.js` : réglages
-- `js/genetique.js`, `js/croissance.js`, `js/missions.js`, `js/economie.js`, `js/sauvegarde.js`, `js/temps.js` : règles du jeu
-- `js/dessin.js` : dessin des coccinelles en SVG
-- `js/composants.js`, `js/interface.js`, `js/ecrans/` : affichage et écrans
+- `js/genetique.js`, `js/croissance.js`, `js/habitats.js`, `js/missions.js`, `js/economie.js`, `js/minijeu.js`, `js/sauvegarde.js`, `js/temps.js` : règles du jeu
+- `js/dessin.js` : dessin des coccinelles en SVG ; `js/icones.js` : la pièce d'or
+- `js/composants.js`, `js/interface.js`, `js/ecrans/` : affichage et écrans (élevage, reproduction, missions, Coccidex, boutique, mini-jeu, révélation)

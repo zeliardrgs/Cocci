@@ -1,5 +1,5 @@
 /* =========================================================
-   ECONOMIE.JS — Pièces d'or, places d'élevage, ventes, boutique,
+   ECONOMIE.JS — Pièces d'or, ventes, boutique, habitats,
    et bonus de première découverte.
    Tous les prix se règlent dans config.js (ECONOMIE).
    ========================================================= */
@@ -9,15 +9,10 @@ Cocci.Economie = (function () {
   var ECO = CONFIG.ECONOMIE;
   var G = Cocci.Genetique;
 
-  /* ---------- Places ---------- */
+  /* ---------- Habitats ---------- */
 
-  // Places encore libres (œufs, larves et nymphes comptent aussi)
-  function placesLibres(etat) {
-    return Math.max(0, etat.places - etat.coccinelles.length);
-  }
-
-  function prixPlace(etat) {
-    return ECO.BOUTIQUE.PLACE.prixDepart + ECO.BOUTIQUE.PLACE.hausse * etat.placesAchetees;
+  function prixHabitat(etat) {
+    return ECO.BOUTIQUE.HABITAT.prixDepart + ECO.BOUTIQUE.HABITAT.hausse * etat.habitatsAchetes;
   }
 
   /* ---------- Découvertes ---------- */
@@ -50,6 +45,33 @@ Cocci.Economie = (function () {
     return prix;
   }
 
+  /* ---------- Faire grandir une petite coccinelle ---------- */
+
+  // Prix pour devenir adulte tout de suite : X pièces par heure restante (heure entamée = heure due)
+  function prixAcceleration(c) {
+    var info = Cocci.Croissance.info(c);
+    if (info.stade !== 'petite') return 0;
+    var heures = Math.ceil(info.resteTotal / Cocci.Temps.heures(1));
+    return Math.max(1, heures) * CONFIG.ACCELERATION.PRIX_PAR_HEURE;
+  }
+
+  // Raison pour laquelle on ne peut pas faire grandir (ou null si c'est possible)
+  function empechementAcceleration(etat, c) {
+    if (!c || c.stade !== 'petite') return 'Seule une petite coccinelle peut grandir plus vite';
+    if (etat.pieces < prixAcceleration(c)) return 'Pas assez de pièces d’or';
+    return null;
+  }
+
+  // Paie et rend la coccinelle adulte. Renvoie le prix payé (0 si impossible).
+  // (Le passage à l'âge adulte est ensuite constaté par Croissance.mettreAJour.)
+  function accelerer(etat, c) {
+    if (empechementAcceleration(etat, c)) return 0;
+    var prix = prixAcceleration(c);
+    etat.pieces -= prix;
+    Cocci.Croissance.avancer(c, Infinity);
+    return prix;
+  }
+
   /* ---------- Coccinelles de la boutique ---------- */
 
   // Sauvage : les 3 gènes sont communs
@@ -71,46 +93,49 @@ Cocci.Economie = (function () {
   // Renvoie { coccinelle, nouvelle }
   function accueillir(etat, genes) {
     var c = G.creerCoccinelle(genes);
+    Cocci.Habitats.installer(etat, c);
     etat.coccinelles.push(c);
     return { coccinelle: c, nouvelle: decouvrir(etat, genes) };
   }
 
   /* ---------- Boutique ---------- */
 
-  var ARTICLES = ['sauvage', 'mystere', 'place'];
+  var ARTICLES = ['sauvage', 'mystere', 'habitat'];
 
   function prix(etat, article) {
     if (article === 'sauvage') return ECO.BOUTIQUE.SAUVAGE.prix;
     if (article === 'mystere') return ECO.BOUTIQUE.MYSTERE.prix;
-    return prixPlace(etat);
+    return prixHabitat(etat);
   }
 
   // Raison pour laquelle on ne peut pas acheter (ou null si c'est possible)
   function empechementAchat(etat, article) {
-    if (article !== 'place' && !placesLibres(etat)) return 'Élevage plein';
+    if (article !== 'habitat' && !Cocci.Habitats.placesLibres(etat)) return 'Habitats pleins';
     if (etat.pieces < prix(etat, article)) return 'Pas assez de pièces d’or';
     return null;
   }
 
   // Achète un article. Renvoie { coccinelle, nouvelle } pour une coccinelle,
-  // { place: true } pour une place, ou null si l'achat est impossible.
+  // { habitat: n° du nouvel habitat }, ou null si l'achat est impossible.
   function acheter(etat, article) {
     if (empechementAchat(etat, article)) return null;
     etat.pieces -= prix(etat, article);
-    if (article === 'place') {
-      etat.places += 1;
-      etat.placesAchetees += 1;
-      return { place: true };
+    if (article === 'habitat') {
+      etat.habitats += 1;
+      etat.habitatsAchetes += 1;
+      return { habitat: etat.habitats - 1 };
     }
     return accueillir(etat, article === 'sauvage' ? genesSauvage() : genesMystere());
   }
 
   return {
-    placesLibres: placesLibres,
-    prixPlace: prixPlace,
+    prixHabitat: prixHabitat,
     decouvrir: decouvrir,
     prixVente: prixVente,
     vendre: vendre,
+    prixAcceleration: prixAcceleration,
+    empechementAcceleration: empechementAcceleration,
+    accelerer: accelerer,
     genesSauvage: genesSauvage,
     accueillir: accueillir,
     ARTICLES: ARTICLES,

@@ -48,68 +48,101 @@ Cocci.Interface = (function () {
      ========================================================= */
 
   var ficheId = null;
-  var venteEnAttente = false;
+  var confirmation = null; // 'vente', 'acceleration' ou 'demenager' quand on attend un choix
 
-  // Ce qu'on a le droit de voir d'un gène selon le stade
-  function ligneGene(c, type) {
-    var g = G.gene(type, c.genes[type]);
-    var visible = c.stade === 'adulte' || (c.stade === 'nymphe' && type === 'carapace');
-    var valeur = '<span class="inconnu">?</span>';
-    if (visible) {
-      var r = G.rareteParPoints(g.rarete);
-      valeur = '<strong>' + g.nom + '</strong>' + (g.teinte ? ' <span class="aide">(' + g.teinte + ')</span>' : '') +
-        (c.stade === 'adulte'
-          ? ' <span class="etiquette" style="--rarete:' + r.couleur + '">' + r.nom + '</span>'
-          : ' <span class="aide">(on la devine)</span>');
+  // Où vit la coccinelle, et bouton pour déménager
+  function blocMaison(c) {
+    var H = Cocci.Habitats;
+    if (c.stade === 'oeuf') return '<p class="fiche-maison">Vit dans : <strong>la nurserie</strong></p>';
+    if (confirmation === 'demenager') {
+      var choix = '';
+      for (var i = 0; i < etat().habitats; i++) {
+        var n = H.habitants(etat(), i).length;
+        var plein = n >= CONFIG.HABITATS.PLACES_PAR_HABITAT;
+        var ici = c.habitat === i;
+        choix += '<button type="button" class="bouton bouton-secondaire" data-action="demenager-vers" data-habitat="' + i + '"' +
+          (plein || ici ? ' disabled' : '') + '>' + H.nom(i) + ' · ' + n + '/' + CONFIG.HABITATS.PLACES_PAR_HABITAT +
+          (ici ? ' (ici)' : plein ? ' (plein)' : '') + '</button>';
+      }
+      return '<div class="fiche-maison fiche-demenager"><p class="fiche-question">Dans quel habitat la faire vivre ?</p>' + choix +
+        '<button type="button" class="bouton bouton-secondaire" data-action="annuler">Annuler</button></div>';
     }
-    return '<dt>' + G.NOMS_TYPES[type] + '</dt><dd>' + valeur + '</dd>';
+    return '<p class="fiche-maison">Vit dans : <strong>' + H.nom(c.habitat) + '</strong>' +
+      (etat().habitats > 1 ? ' <button type="button" class="lien" data-action="demenager">Déménager</button>' : '') + '</p>';
+  }
+
+  // Ce qu'on a le droit de voir d'un gène : tout, sauf dans l'œuf
+  function ligneGene(c, type) {
+    if (c.stade === 'oeuf') return '<dt>' + G.NOMS_TYPES[type] + '</dt><dd><span class="inconnu">?</span></dd>';
+    var g = G.gene(type, c.genes[type]);
+    var r = G.rareteParPoints(g.rarete);
+    return '<dt>' + G.NOMS_TYPES[type] + '</dt><dd><strong>' + g.nom + '</strong>' +
+      (g.teinte ? ' <span class="aide">(' + g.teinte + ')</span>' : '') +
+      ' <span class="etiquette" style="--rarete:' + r.couleur + '">' + r.nom + '</span></dd>';
+  }
+
+  function actionsAdulte(c) {
+    var prix = E.prixVente(c);
+    if (confirmation === 'vente') {
+      return '<p class="fiche-question">Vendre cette coccinelle pour <strong>' + prix + ' pièces d’or</strong> ? Elle quittera ton élevage.</p>' +
+        '<button type="button" class="bouton bouton-danger" data-action="confirmer-vente">Oui, vendre</button>' +
+        '<button type="button" class="bouton bouton-secondaire" data-action="annuler">Non, la garder</button>';
+    }
+    return '<button type="button" class="bouton" data-action="parent">Choisir comme parent</button>' +
+      '<button type="button" class="bouton bouton-secondaire" data-action="vendre">Vendre · ' + Cocci.Icones.montant(prix) + '</button>';
+  }
+
+  function actionsPetite(c) {
+    var prix = E.prixAcceleration(c);
+    if (confirmation === 'acceleration') {
+      return '<p class="fiche-question">La faire grandir tout de suite pour <strong>' + prix + ' pièces d’or</strong> ? Elle deviendra adulte immédiatement.</p>' +
+        '<button type="button" class="bouton" data-action="confirmer-acceleration">Oui, la faire grandir</button>' +
+        '<button type="button" class="bouton bouton-secondaire" data-action="annuler">Non</button>';
+    }
+    var raison = E.empechementAcceleration(etat(), c);
+    return '<button type="button" class="bouton" data-action="accelerer"' + (raison ? ' disabled' : '') + '>' +
+        (raison || 'Faire grandir · ' + Cocci.Icones.montant(prix)) + '</button>' +
+      '<button type="button" class="bouton bouton-secondaire" data-action="jouer" data-bouton-jeu="' + c.id + '"' +
+        (Cocci.MiniJeu.peutJouer(c) ? '' : ' disabled') + '>' + UI.texteJouer(c) + '</button>' +
+      '<p class="aide">Une petite coccinelle ne peut pas encore se reproduire, être vendue ni partir en mission.</p>';
   }
 
   function afficherFiche() {
     var c = UI.trouver(ficheId);
     if (!c) { fermerFiche(); return; }
-    var adulte = c.stade === 'adulte';
+    var cache = c.stade === 'oeuf';
     var rarete = G.rareteGlobale(c.genes);
     var html = '';
 
     html += '<div class="fiche-entete">' +
-      '<h2 id="fiche-titre">' + (adulte ? G.nom(c.genes) : C.NOMS[c.stade] + ' de coccinelle') + '</h2>' +
+      '<h2 id="fiche-titre">' + (cache ? 'Œuf mystère' : G.nom(c.genes)) + '</h2>' +
       '<button type="button" class="bouton-fermer" data-action="fermer" aria-label="Fermer la fiche">×</button></div>';
 
-    html += '<div class="fiche-dessin"' + (adulte ? ' style="--rarete:' + rarete.couleur + '"' : '') + '>' +
+    html += '<div class="fiche-dessin"' + (cache ? '' : ' style="--rarete:' + rarete.couleur + '"') + '>' +
       D.selonStade(c, c.stade, { taille: 170 }) + '</div>';
 
-    html += adulte
-      ? '<p class="fiche-rarete"><span class="etiquette" style="--rarete:' + rarete.couleur + '">' + rarete.nom + ' · ' + G.points(c.genes) + ' pts</span></p>'
-      : '<p class="fiche-rarete aide">Rareté : ? — elle sera révélée à l\'âge adulte</p>';
+    html += cache
+      ? '<p class="fiche-rarete aide">Rareté : ? — tout sera révélé à l’éclosion</p>'
+      : '<p class="fiche-rarete"><span class="pastille-stade-texte">' + C.NOMS[c.stade] + '</span> ' +
+        '<span class="etiquette" style="--rarete:' + rarete.couleur + '">' + rarete.nom + ' · ' + G.points(c.genes) + ' pts</span></p>';
 
     html += '<dl class="fiche-genes">' + G.TYPES.map(function (t) { return ligneGene(c, t); }).join('') + '</dl>';
 
-    if (c.stade === 'oeuf') html += '<p class="aide">Les gènes sont cachés dans l\'œuf.</p>';
-    if (c.stade === 'larve') html += '<p class="aide">Indice : la couleur des taches de la larve annonce celle de sa carapace.</p>';
+    if (cache) html += '<p class="aide">Les gènes sont cachés dans l’œuf : surprise à l’éclosion ! Un œuf ne peut pas être accéléré.</p>';
 
-    if (!adulte) {
+    if (c.stade !== 'adulte') {
       html += '<div class="fiche-suivi" data-suivi="' + c.id + '"><strong>Stade : ' + C.NOMS[c.stade] + '</strong>' + UI.blocSuivi(c) + '</div>';
-    } else {
-      var prix = E.prixVente(c);
-      html += '<div class="fiche-actions">';
-      if (venteEnAttente) {
-        html += '<p class="fiche-question">Vendre cette coccinelle pour <strong>' + prix + ' pièces d’or</strong> ? Elle quittera ton élevage.</p>' +
-          '<button type="button" class="bouton bouton-danger" data-action="confirmer-vente">Oui, vendre</button>' +
-          '<button type="button" class="bouton bouton-secondaire" data-action="annuler-vente">Non, la garder</button>';
-      } else {
-        html += '<button type="button" class="bouton" data-action="parent">Choisir comme parent</button>' +
-          '<button type="button" class="bouton bouton-secondaire" data-action="vendre">Vendre · ' + Cocci.Icones.montant(prix) + '</button>';
-      }
-      html += '</div>';
     }
+    html += blocMaison(c);
+    if (c.stade === 'petite') html += '<div class="fiche-actions">' + actionsPetite(c) + '</div>';
+    if (c.stade === 'adulte') html += '<div class="fiche-actions">' + actionsAdulte(c) + '</div>';
 
     $('fiche-contenu').innerHTML = html;
   }
 
   function ouvrirFiche(id) {
     ficheId = id;
-    venteEnAttente = false;
+    confirmation = null;
     afficherFiche();
     if (!$('fiche').open) $('fiche').showModal();
   }
@@ -119,12 +152,24 @@ Cocci.Interface = (function () {
     if ($('fiche').open) $('fiche').close();
   }
 
-  function actionFiche(action) {
+  function actionFiche(action, donnees) {
     var c = UI.trouver(ficheId);
     if (action === 'fermer') return fermerFiche();
     if (!c) return;
-    if (action === 'vendre') { venteEnAttente = true; afficherFiche(); return; }
-    if (action === 'annuler-vente') { venteEnAttente = false; afficherFiche(); return; }
+    if (action === 'demenager') { confirmation = 'demenager'; afficherFiche(); return; }
+    if (action === 'demenager-vers') {
+      var vers = Number(donnees.habitat);
+      if (Cocci.Habitats.demenager(etat(), c, vers)) {
+        Cocci.Jeu.enregistrer();
+        UI.annoncer(G.nom(c.genes) + ' s’installe dans ' + Cocci.Habitats.nom(vers) + '.');
+      }
+      confirmation = null;
+      rafraichir();
+      return;
+    }
+    if (action === 'vendre') { confirmation = 'vente'; afficherFiche(); return; }
+    if (action === 'accelerer') { confirmation = 'acceleration'; afficherFiche(); return; }
+    if (action === 'annuler') { confirmation = null; afficherFiche(); return; }
     if (action === 'confirmer-vente') {
       var nom = G.nom(c.genes);
       var prix = E.vendre(etat(), c.id);
@@ -132,6 +177,20 @@ Cocci.Interface = (function () {
       Cocci.Jeu.enregistrer();
       UI.annoncer(nom + ' vendue : <strong>+' + Cocci.Icones.montant(prix) + '</strong>');
       rafraichir();
+      return;
+    }
+    if (action === 'confirmer-acceleration') {
+      confirmation = null;
+      var paye = E.accelerer(etat(), c);
+      if (paye) {
+        UI.annoncer('−' + Cocci.Icones.montant(paye));
+        traiterChangements(); // elle devient adulte tout de suite (fiche redessinée)
+      }
+      return;
+    }
+    if (action === 'jouer') {
+      fermerFiche();
+      Cocci.Chasse.ouvrir(c.id);
       return;
     }
     if (action === 'parent') {
@@ -145,9 +204,9 @@ Cocci.Interface = (function () {
      ========================================================= */
 
   function phraseChangement(ch) {
-    if (ch.vers === 'larve') return 'Un œuf a éclos : une larve est sortie !';
-    if (ch.vers === 'nymphe') return 'Une larve est devenue nymphe.';
-    return '<strong>' + G.nom(ch.coccinelle.genes) + '</strong> est devenue adulte !';
+    var nom = '<strong>' + G.nom(ch.coccinelle.genes) + '</strong>';
+    if (ch.vers === 'petite') return 'Un œuf a éclos : ' + nom + ' !';
+    return nom + ' est devenue adulte !';
   }
 
   var BONUS = CONFIG.ECONOMIE.RECOMPENSE_DECOUVERTE;
@@ -158,34 +217,51 @@ Cocci.Interface = (function () {
 
   // Version simple, embellie à l'étape 7
   function afficherAbsence(absence) {
-    var lignes = absence.changements.map(function (ch) {
-      return '<li>' + phraseChangement(ch) +
-        (ch.nouvelle ? ' <span class="pastille-texte">Nouvelle combinaison ! +' + Cocci.Icones.montant(BONUS) + '</span>' : '') + '</li>';
-    });
-    if (absence.nouvellesMissions) lignes.push('<li>' + phraseMissions(absence.nouvellesMissions) + '</li>');
+    var eclosions = absence.changements.filter(function (ch) { return ch.vers === 'petite'; });
+    var adultes = absence.changements.filter(function (ch) { return ch.vers === 'adulte'; });
+    var lignes = [];
+    if (eclosions.length) {
+      lignes.push('<li class="absence-titre">' + eclosions.length + ' éclosion' + (eclosions.length > 1 ? 's' : '') + '</li>');
+      eclosions.forEach(function (ch) {
+        lignes.push('<li class="absence-ligne">' + D.selonStade(ch.coccinelle, 'petite', { taille: 44 }) + '<span>' + phraseChangement(ch) +
+          (ch.nouvelle ? ' <span class="pastille-texte">Nouvelle combinaison ! +' + Cocci.Icones.montant(BONUS) + '</span>' : '') + '</span></li>');
+      });
+    }
+    if (adultes.length) {
+      lignes.push('<li class="absence-titre">' + adultes.length + ' coccinelle' + (adultes.length > 1 ? 's devenues adultes' : ' devenue adulte') + '</li>');
+      adultes.forEach(function (ch) {
+        lignes.push('<li class="absence-ligne">' + D.coccinelle(ch.coccinelle.genes, { taille: 44 }) + '<span>' + phraseChangement(ch) + '</span></li>');
+      });
+    }
+    if (absence.nouvellesMissions) lignes.push('<li class="absence-titre">' + phraseMissions(absence.nouvellesMissions) + '</li>');
     if (!lignes.length) return;
     $('absence-liste').innerHTML = lignes.join('');
     $('absence').hidden = false;
   }
 
-  /* ---------- Horloge : chaque seconde ---------- */
-  function tic() {
+  /* ---------- Constater ce qui a changé (horloge, achat, mini-jeu) ---------- */
+  function traiterChangements() {
     var changements = C.mettreAJour(etat());
     var nouvellesMissions = Cocci.Missions.mettreAJour(etat());
 
     changements.forEach(function (ch) {
-      UI.annoncer(phraseChangement(ch) +
-        (ch.nouvelle ? '<br><strong>Nouvelle combinaison ! +' + Cocci.Icones.montant(BONUS) + '</strong>' : ''), ch.nouvelle);
+      if (ch.vers === 'petite') Cocci.Revelation.ajouter(ch.coccinelle, ch.nouvelle); // la grande révélation
+      else UI.annoncer(phraseChangement(ch));
     });
     if (nouvellesMissions) UI.annoncer(phraseMissions(nouvellesMissions));
 
     if (changements.length || nouvellesMissions) {
       Cocci.Jeu.enregistrer();
-      // la fiche ouverte n'est redessinée que si c'est sa coccinelle qui a grandi
+      // la fiche ouverte n'est redessinée que si c'est sa coccinelle qui a changé
       rafraichir(!changements.some(function (ch) { return ch.coccinelle.id === ficheId; }));
-    } else {
-      UI.majSuivis();
     }
+    return changements.length > 0;
+  }
+
+  /* ---------- Horloge : chaque seconde ---------- */
+  function tic() {
+    if (!traiterChangements()) UI.majSuivis();
+    Cocci.Revelation.suivante(); // une éclosion mise en attente pendant le mini-jeu
     if (Cocci.Ecrans[ecranActuel].tic) Cocci.Ecrans[ecranActuel].tic();
   }
 
@@ -220,7 +296,7 @@ Cocci.Interface = (function () {
     $('fiche').addEventListener('click', function (ev) {
       if (ev.target === $('fiche')) return fermerFiche(); // clic à côté de la fenêtre
       var bouton = ev.target.closest('[data-action]');
-      if (bouton) actionFiche(bouton.dataset.action);
+      if (bouton) actionFiche(bouton.dataset.action, bouton.dataset);
     });
     // fermeture avec la touche Échap (l'annonce arrive un peu après : on ignore
     // si une autre fiche a été rouverte entre-temps)
@@ -230,6 +306,8 @@ Cocci.Interface = (function () {
     brancherReinitialisation();
 
     Cocci.Boutique.init();
+    Cocci.Chasse.init();
+    Cocci.Revelation.init();
     $('bouton-boutique').addEventListener('click', Cocci.Boutique.ouvrir);
 
     afficherAbsence(absence || { changements: [], nouvellesMissions: 0 });
@@ -242,6 +320,7 @@ Cocci.Interface = (function () {
     demarrer: demarrer,
     allerA: allerA,
     rafraichir: rafraichir,
-    ouvrirFiche: ouvrirFiche
+    ouvrirFiche: ouvrirFiche,
+    traiterChangements: traiterChangements
   };
 })();

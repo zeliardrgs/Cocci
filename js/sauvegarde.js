@@ -16,8 +16,8 @@ Cocci.Sauvegarde = (function () {
       creeLe: maintenant,
       derniereSauvegarde: maintenant,
       pieces: depart.pieces,
-      places: depart.places,
-      placesAchetees: 0,
+      habitats: Cocci.CONFIG.HABITATS.AU_DEPART, // en plus de la nurserie
+      habitatsAchetes: 0,
       coccinelles: depart.coccinelles.map(function (genes) {
         return Cocci.Genetique.creerCoccinelle(genes);
       }),
@@ -27,6 +27,7 @@ Cocci.Sauvegarde = (function () {
     };
     etat.coccinelles.forEach(function (c) {
       etat.coccidex[Cocci.Genetique.cle(c.genes)] = maintenant;
+      c.habitat = 0;
     });
     return etat;
   }
@@ -80,6 +81,22 @@ Cocci.Sauvegarde = (function () {
     return etat;
   }
 
+  /* ---------- Ancien cycle de vie (larve, nymphe) ----------
+     Une larve ou une nymphe devient une petite coccinelle. Le moment de
+     ponte ne change pas et la durée totale est la même qu'avant (24 h,
+     30 h…) : le temps restant avant l'âge adulte est donc conservé.
+     Comme la révélation se fait maintenant à l'éclosion, sa combinaison
+     entre aussi au Coccidex.                                           */
+  function convertirStades(etat) {
+    etat.coccinelles.forEach(function (c) {
+      if (c.stade !== 'larve' && c.stade !== 'nymphe') return;
+      c.stade = 'petite';
+      c.eclosion = c.ponte + Cocci.Croissance.dureeStade(c, 'oeuf');
+      Cocci.Economie.decouvrir(etat, c.genes, c.eclosion);
+    });
+    return etat;
+  }
+
   // Relit la partie enregistrée, ou renvoie null s'il n'y en a pas
   function charger() {
     try {
@@ -92,7 +109,14 @@ Cocci.Sauvegarde = (function () {
         etat.pieces = etat.pucerons;
         delete etat.pucerons;
       }
-      return convertirCouleurs(completer(etat));
+      // les anciennes parties comptaient en places : 6 places = 1 habitat (arrondi au-dessus)
+      if ('places' in etat && !('habitats' in etat)) {
+        etat.habitats = Math.max(1, Math.ceil(etat.places / Cocci.CONFIG.HABITATS.PLACES_PAR_HABITAT));
+        etat.habitatsAchetes = etat.habitats - Cocci.CONFIG.HABITATS.AU_DEPART;
+        delete etat.places;
+        delete etat.placesAchetees;
+      }
+      return Cocci.Habitats.ranger(convertirStades(convertirCouleurs(completer(etat))));
     } catch (e) {
       return null; // sauvegarde illisible ou navigateur qui bloque le stockage
     }

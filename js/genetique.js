@@ -179,9 +179,8 @@ Cocci.Genetique = (function () {
     if (!A || !B) return 'Choisis deux parents.';
     if (A.id === B.id) return 'Il faut deux coccinelles différentes.';
     if (A.stade !== 'adulte' || B.stade !== 'adulte') return 'Seuls les adultes peuvent se reproduire.';
-    if (etat.coccinelles.length >= etat.places) {
-      return 'Ton élevage est plein (' + etat.coccinelles.length + '/' + etat.places + ' places). Vends une coccinelle ou achète une place à la boutique.';
-    }
+    var place = Cocci.Habitats.empechementPonte(etat);
+    if (place) return place;
     var reste = reposRestant(etat, A, B);
     if (reste > 0) return 'Ce couple se repose encore ' + Cocci.Temps.formater(reste) + '.';
     return null;
