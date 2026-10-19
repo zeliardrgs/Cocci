@@ -1,0 +1,652 @@
+/* =========================================================
+   STYLE.CSS — Ambiance jardin, style plat et doux.
+   Les couleurs principales sont regroupées juste en dessous.
+   ========================================================= */
+
+:root {
+  --fond: #eef6e4;          /* vert très pâle, comme une prairie */
+  --fond-carte: #ffffff;
+  --texte: #2f3a2f;
+  --texte-doux: #6b7a68;
+  --accent: #5aa05a;        /* vert feuille */
+  --accent-fonce: #417f43;
+  --rayon: 18px;
+  --ombre: 0 3px 10px rgba(60, 90, 50, 0.12);
+  --police: "Nunito", "Segoe UI Rounded", "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: var(--police);
+  line-height: 1.4;
+  /* place pour la barre de navigation en bas */
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+/* Texte lu par les lecteurs d'écran mais invisible */
+.visuellement-cache {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- En-tête ---------- */
+.entete {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 16px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  border-radius: 0 0 var(--rayon) var(--rayon);
+  box-shadow: var(--ombre);
+}
+.entete h1 { margin: 0; font-size: 1.4rem; }
+#titre-jeu { cursor: default; user-select: none; }
+.pucerons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px 14px 4px 10px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 99px;
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+.badge-test {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 0.75rem;
+  background: #ffd84d;
+  color: #5a4500;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+/* ---------- Contenu ---------- */
+.contenu {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+}
+section { margin-bottom: 28px; }
+h2 { font-size: 1.1rem; margin: 0 0 12px; }
+
+.section-titre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.section-titre h2 { margin: 0; }
+
+/* ---------- Boutons (zone tactile ≥ 44 px) ---------- */
+.bouton {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 99px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--ombre);
+  transition: transform 0.1s, background 0.2s;
+}
+.bouton:hover { background: var(--accent-fonce); }
+.bouton:active { transform: scale(0.96); }
+.bouton:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
+.bouton:disabled {
+  background: #c5cfc0;
+  color: #6b7a68;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+.bouton-secondaire {
+  background: #fff;
+  color: var(--accent-fonce);
+  border: 2px solid var(--accent);
+}
+.bouton-secondaire:hover { background: #f1f8ec; }
+.bouton-large {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 16px auto 0;
+  font-size: 1.1rem;
+}
+
+/* ---------- Textes d'aide ---------- */
+.aide { color: var(--texte-doux); font-size: 0.8rem; }
+.message { text-align: center; margin: 8px 0 0; font-weight: 700; color: var(--texte-doux); }
+
+/* ---------- Panneau blanc ---------- */
+.panneau {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: var(--rayon);
+  padding: 16px;
+}
+
+/* ---------- Grille de cartes ---------- */
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+/* Chaque carte reçoit sa couleur de rareté via --rarete */
+.carte {
+  position: relative;
+  background: var(--fond-carte);
+  border: 3px solid var(--rarete, #ccc);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  padding: 10px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font: inherit;
+  color: inherit;
+}
+button.carte { cursor: pointer; transition: transform 0.1s; }
+button.carte:active { transform: scale(0.97); }
+button.carte:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
+.carte-choisie { background: #fff8d6; }
+
+/* Pastilles « A », « B », « Nouveau » */
+.marque, .pastille-nouveau {
+  position: absolute;
+  top: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: 99px;
+  padding: 2px 8px;
+}
+.marque { left: 6px; background: var(--texte); color: #fff; min-width: 24px; }
+.pastille-nouveau { right: 6px; background: #ffd84d; color: #5a4500; }
+
+/* l'ombre portée du dessin d'origine, appliquée ici */
+.coccinelle { filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25)); flex-shrink: 0; }
+.carte .coccinelle { height: 120px; width: auto; max-width: 100%; }
+.carte-nom { display: block; margin: 6px 0; font-size: 0.85rem; font-weight: 700; }
+
+/* Étiquette de rareté : toujours un texte, jamais la couleur seule */
+.etiquette {
+  display: inline-block;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--rarete, #999);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+/* ---------- Emplacements Parent A / Parent B ---------- */
+.parents {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.plus { font-size: 2rem; font-weight: 800; color: var(--accent); }
+.emplacement {
+  min-height: 210px;
+  background: var(--fond-carte);
+  border: 3px solid var(--rarete, var(--accent));
+  border-radius: var(--rayon);
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+.emplacement-vide { border-style: dashed; background: transparent; cursor: default; }
+.emplacement-titre { font-weight: 800; margin-bottom: 4px; }
+.emplacement .aide { margin-top: 4px; }
+
+/* ---------- Naissance ---------- */
+.naissance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 12px;
+  background: #fff;
+  border-radius: var(--rayon);
+  animation: apparition 0.4s ease-out;
+}
+.naissance .carte { width: 150px; box-shadow: none; }
+.naissance-texte { flex: 1 1 220px; }
+.naissance-texte h3 { margin: 0 0 6px; }
+.naissance-texte ul { margin: 0; padding-left: 18px; }
+.naissance-texte li { margin: 4px 0; }
+.evenement { color: #9457d6; font-weight: 700; }
+
+@keyframes apparition {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- Liste des bébés possibles ---------- */
+.resultats { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.resultat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-left: 6px solid var(--rarete);
+  border-radius: 12px;
+  padding: 6px 12px 6px 8px;
+}
+.resultat-texte { flex: 1; min-width: 0; }
+.resultat-texte .carte-nom { margin: 0 0 2px; }
+.resultat-chance { text-align: right; font-size: 1.05rem; }
+.simule { display: block; font-size: 0.75rem; color: var(--texte-doux); }
+
+/* ---------- Dépliants ---------- */
+.depliant { margin-top: 12px; }
+.depliant summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--accent-fonce);
+}
+.depliant h3 { font-size: 1rem; margin: 16px 0 8px; }
+
+@media (max-width: 400px) {
+  .grille { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .emplacement { min-height: 190px; }
+  .emplacement .carte-nom { font-size: 0.75rem; }
+}
+
+/* ---------- Croissance : barre de progression ---------- */
+.carte-croissance { border-color: #b9c9b0; border-style: dashed; }
+.barre {
+  display: block;
+  width: 100%;
+  max-width: 130px;
+  height: 10px;
+  margin: 4px 0;
+  background: #e3ecdc;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.barre-remplie {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.9s linear;
+}
+.suivi { font-size: 0.8rem; font-weight: 700; }
+.suivi-total { margin-top: 2px; }
+
+/* ---------- Résumé de l'absence ---------- */
+.bandeau {
+  background: #fff8d6;
+  border: 2px solid #ffd84d;
+  border-radius: var(--rayon);
+  padding: 12px 16px;
+}
+.bandeau ul { margin: 0; padding-left: 18px; }
+.bandeau li { margin: 4px 0; }
+.pastille-texte {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: #ffd84d;
+  color: #5a4500;
+  border-radius: 99px;
+  padding: 1px 8px;
+}
+
+/* ---------- Annonces ---------- */
+.annonces {
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(92vw, 420px);
+  display: grid;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+.annonce {
+  background: var(--texte);
+  color: #fff;
+  border-radius: 14px;
+  padding: 10px 14px;
+  text-align: center;
+  box-shadow: var(--ombre);
+  animation: apparition 0.3s ease-out;
+}
+.annonce-nouvelle { background: #d99a1e; }
+
+/* =========================================================
+   ÉTAPE 4 — Écrans, navigation, fiche
+   ========================================================= */
+.ecran { margin-bottom: 0; }
+.ecran > .panneau { margin-bottom: 20px; }
+.contenu { max-width: 900px; }
+
+.pastille-info {
+  font-size: 0.85rem;
+  font-weight: 800;
+  background: #fff;
+  color: var(--accent-fonce);
+  border-radius: 99px;
+  padding: 4px 12px;
+}
+
+/* Places libres de l'élevage */
+.carte-vide {
+  min-height: 210px;
+  justify-content: center;
+  border: 3px dashed #c9d8bf;
+  background: transparent;
+  box-shadow: none;
+  color: #9aab92;
+  font-weight: 700;
+}
+button.carte-croissance { cursor: pointer; }
+.bouton-test { margin-top: 16px; }
+
+/* Écrans provisoires */
+.bientot {
+  background: #fff;
+  border-radius: var(--rayon);
+  padding: 16px;
+  box-shadow: var(--ombre);
+  margin-top: 12px;
+}
+.bientot p { margin: 0 0 6px; }
+.barre-large { max-width: none; height: 12px; }
+
+/* ---------- Barre de navigation ---------- */
+.navigation {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 -3px 12px rgba(60, 90, 50, 0.12);
+  border-radius: var(--rayon) var(--rayon) 0 0;
+  padding: 6px 8px;
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
+}
+.nav-bouton {
+  flex: 1;
+  max-width: 140px;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--texte-doux);
+  cursor: pointer;
+}
+.nav-bouton svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.nav-bouton[aria-current="page"] { color: var(--accent-fonce); background: #e7f3df; }
+.nav-bouton[aria-current="page"] svg { fill: #bfe3a8; }
+.nav-bouton:focus-visible { outline: 3px solid #ffd84d; outline-offset: -3px; }
+
+/* Les annonces passent au-dessus de la barre de navigation */
+.annonces { bottom: calc(84px + env(safe-area-inset-bottom)); }
+
+/* ---------- Fiche d'une coccinelle ---------- */
+.fiche {
+  width: min(420px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  border: none;
+  border-radius: 22px;
+  padding: 16px;
+  color: var(--texte);
+  font-family: var(--police);
+  box-shadow: 0 10px 40px rgba(30, 50, 25, 0.3);
+}
+.fiche[open] { animation: apparition 0.25s ease-out; }
+.fiche::backdrop { background: rgba(30, 50, 25, 0.45); }
+.fiche-entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.fiche-entete h2 { margin: 6px 0 0; font-size: 1.2rem; }
+.bouton-fermer {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: #eef3ea;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--texte);
+  cursor: pointer;
+}
+.fiche-dessin {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: var(--rayon);
+  background: #f4f9ef;
+  border: 3px solid var(--rarete, #dfe9d7);
+}
+.fiche-rarete { text-align: center; margin: 4px 0 12px; }
+.fiche-genes {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 12px;
+  margin: 0 0 8px;
+  align-items: center;
+}
+.fiche-genes dt { color: var(--texte-doux); font-size: 0.9rem; }
+.fiche-genes dd { margin: 0; }
+.inconnu {
+  display: inline-block;
+  min-width: 28px;
+  text-align: center;
+  font-weight: 800;
+  background: #eef3ea;
+  border-radius: 8px;
+}
+.fiche-suivi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 12px;
+  background: #f4f9ef;
+  border-radius: 14px;
+}
+.fiche-suivi .barre { max-width: none; }
+.fiche-actions { display: grid; gap: 8px; margin-top: 12px; }
+.fiche-question { margin: 0 0 4px; text-align: center; }
+.bouton-danger { background: #d9534f; }
+.bouton-danger:hover { background: #b9403c; }
+
+@media (min-width: 700px) {
+  .entete { padding-left: 24px; padding-right: 24px; }
+}
+
+/* =========================================================
+   ÉTAPE 5 — Boutique et missions
+   ========================================================= */
+button.pucerons { border: none; color: #fff; font-family: inherit; cursor: pointer; }
+button.pucerons:hover { background: rgba(255, 255, 255, 0.32); }
+button.pucerons:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
+.pucerons-boutique {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #fff;
+  color: var(--accent-fonce);
+  border-radius: 99px;
+  padding: 2px 8px;
+  margin-left: 2px;
+}
+#bouton-boutique-elevage { margin-bottom: 12px; }
+
+/* ---------- Boutique ---------- */
+.boutique-solde { margin: 4px 0 12px; }
+.articles { display: grid; gap: 10px; }
+.article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  align-items: center;
+  background: #f4f9ef;
+  border-radius: 16px;
+  padding: 10px 12px;
+}
+.article .coccinelle { grid-row: span 2; height: 80px; width: auto; }
+.article-place {
+  grid-row: span 2;
+  width: 62px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed #b9c9b0;
+  border-radius: 14px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-fonce);
+}
+.article-texte h3 { margin: 0; font-size: 1rem; }
+.article-texte p { margin: 2px 0 0; }
+.article .bouton { grid-column: 2; justify-self: start; }
+.achat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #fff8d6;
+  border-radius: 16px;
+  animation: apparition 0.4s ease-out;
+}
+.achat p { margin: 0; }
+.achat .carte { width: 150px; box-shadow: none; }
+
+/* ---------- Missions ---------- */
+.missions { display: grid; gap: 14px; }
+@media (min-width: 800px) {
+  .missions { grid-template-columns: repeat(3, 1fr); align-items: start; }
+}
+.mission {
+  background: #fff;
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  padding: 12px 14px 14px;
+  border-top: 6px solid var(--couleur-niveau, var(--accent));
+}
+.niveau-facile    { --couleur-niveau: #6cc070; }
+.niveau-moyenne   { --couleur-niveau: #f2a33a; }
+.niveau-difficile { --couleur-niveau: #d9534f; }
+.mission-entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.niveau {
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--couleur-niveau);
+  border-radius: 99px;
+  padding: 3px 10px;
+}
+.recompense { font-size: 0.9rem; }
+.mission-corps { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.mission-corps .fiche-genes { flex: 1; margin: 0; font-size: 0.9rem; }
+.mission .question { margin: 8px 0; font-weight: 700; }
+.actions-ligne { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions-ligne .bouton { flex: 1 1 140px; }
+.grille-petite {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  margin-bottom: 10px;
+}
+.grille-petite .carte .coccinelle { height: 90px; }
+.mission-vide {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top-color: #c9d8bf;
+  color: var(--texte-doux);
+}
+.mission-vide p { margin: 0; }
+.etiquette { white-space: nowrap; }
+
+/* =========================================================
+   EFFETS SPÉCIAUX DES COULEURS
+   ========================================================= */
+/* Prime : petites étincelles qui scintillent doucement */
+.scintille {
+  opacity: 0.15;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scintille 2.6s ease-in-out infinite;
+}
+@keyframes scintille {
+  0%, 100% { opacity: 0.1; transform: scale(0.6); }
+  50%      { opacity: 0.95; transform: scale(1); }
+}
+/* « Réduire les animations » activé dans le système : tout s'arrête */
+@media (prefers-reduced-motion: reduce) {
+  .scintille { animation: none; opacity: 0.7; transform: none; }
+  .naissance, .annonce, .achat, .fiche[open] { animation: none; }
+  .barre-remplie { transition: none; }
+}
