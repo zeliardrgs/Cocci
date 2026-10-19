@@ -15,7 +15,7 @@ Cocci.Sauvegarde = (function () {
       version: VERSION,
       creeLe: maintenant,
       derniereSauvegarde: maintenant,
-      pucerons: depart.pucerons,
+      pieces: depart.pieces,
       places: depart.places,
       placesAchetees: 0,
       coccinelles: depart.coccinelles.map(function (genes) {
@@ -87,6 +87,11 @@ Cocci.Sauvegarde = (function () {
       if (!texte) return null;
       var etat = JSON.parse(texte);
       if (!etat || etat.version !== VERSION) return null;
+      // les anciennes parties comptaient en pucerons : même nombre, en pièces d'or
+      if ('pucerons' in etat && !('pieces' in etat)) {
+        etat.pieces = etat.pucerons;
+        delete etat.pucerons;
+      }
       return convertirCouleurs(completer(etat));
     } catch (e) {
       return null; // sauvegarde illisible ou navigateur qui bloque le stockage

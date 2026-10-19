@@ -37,7 +37,7 @@ Cocci.Interface = (function () {
   // À appeler après chaque changement de la partie.
   // garderFiche : ne pas redessiner la fiche ouverte (évite de perdre un clic en cours)
   function rafraichir(garderFiche) {
-    $('compteur-pucerons').textContent = etat().pucerons;
+    $('compteur-pieces').textContent = etat().pieces;
     Cocci.Ecrans[ecranActuel].afficher();
     if (Cocci.Boutique.estOuverte() && !garderFiche) Cocci.Boutique.afficher();
     if (ficheId && !garderFiche) afficherFiche();
@@ -94,12 +94,12 @@ Cocci.Interface = (function () {
       var prix = E.prixVente(c);
       html += '<div class="fiche-actions">';
       if (venteEnAttente) {
-        html += '<p class="fiche-question">Vendre cette coccinelle pour <strong>' + prix + ' pucerons</strong> ? Elle quittera ton élevage.</p>' +
+        html += '<p class="fiche-question">Vendre cette coccinelle pour <strong>' + prix + ' pièces d’or</strong> ? Elle quittera ton élevage.</p>' +
           '<button type="button" class="bouton bouton-danger" data-action="confirmer-vente">Oui, vendre</button>' +
           '<button type="button" class="bouton bouton-secondaire" data-action="annuler-vente">Non, la garder</button>';
       } else {
         html += '<button type="button" class="bouton" data-action="parent">Choisir comme parent</button>' +
-          '<button type="button" class="bouton bouton-secondaire" data-action="vendre">Vendre · ' + prix + ' pucerons</button>';
+          '<button type="button" class="bouton bouton-secondaire" data-action="vendre">Vendre · ' + Cocci.Icones.montant(prix) + '</button>';
       }
       html += '</div>';
     }
@@ -130,7 +130,7 @@ Cocci.Interface = (function () {
       var prix = E.vendre(etat(), c.id);
       fermerFiche();
       Cocci.Jeu.enregistrer();
-      UI.annoncer(nom + ' vendue : <strong>+' + prix + ' pucerons</strong>');
+      UI.annoncer(nom + ' vendue : <strong>+' + Cocci.Icones.montant(prix) + '</strong>');
       rafraichir();
       return;
     }
@@ -160,7 +160,7 @@ Cocci.Interface = (function () {
   function afficherAbsence(absence) {
     var lignes = absence.changements.map(function (ch) {
       return '<li>' + phraseChangement(ch) +
-        (ch.nouvelle ? ' <span class="pastille-texte">Nouvelle combinaison ! +' + BONUS + ' pucerons</span>' : '') + '</li>';
+        (ch.nouvelle ? ' <span class="pastille-texte">Nouvelle combinaison ! +' + Cocci.Icones.montant(BONUS) + '</span>' : '') + '</li>';
     });
     if (absence.nouvellesMissions) lignes.push('<li>' + phraseMissions(absence.nouvellesMissions) + '</li>');
     if (!lignes.length) return;
@@ -175,7 +175,7 @@ Cocci.Interface = (function () {
 
     changements.forEach(function (ch) {
       UI.annoncer(phraseChangement(ch) +
-        (ch.nouvelle ? '<br><strong>Nouvelle combinaison ! +' + BONUS + ' pucerons</strong>' : ''), ch.nouvelle);
+        (ch.nouvelle ? '<br><strong>Nouvelle combinaison ! +' + Cocci.Icones.montant(BONUS) + '</strong>' : ''), ch.nouvelle);
     });
     if (nouvellesMissions) UI.annoncer(phraseMissions(nouvellesMissions));
 
@@ -233,7 +233,7 @@ Cocci.Interface = (function () {
     $('bouton-boutique').addEventListener('click', Cocci.Boutique.ouvrir);
 
     afficherAbsence(absence || { changements: [], nouvellesMissions: 0 });
-    $('compteur-pucerons').textContent = etat().pucerons;
+    $('compteur-pieces').textContent = etat().pieces;
     allerA('elevage');
     setInterval(tic, 1000);
   }

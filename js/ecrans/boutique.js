@@ -1,5 +1,5 @@
 /* =========================================================
-   BOUTIQUE — fenêtre ouverte depuis le compteur de pucerons
+   BOUTIQUE — fenêtre ouverte depuis le compteur de pièces d'or
    (en haut) ou le bouton « Boutique » de l'élevage.
    ========================================================= */
 
@@ -36,19 +36,19 @@ Cocci.Boutique = (function () {
     return '<article class="article">' + visuel(article) +
       '<div class="article-texte"><h3>' + TEXTES[article].titre + '</h3><p class="aide">' + description + '</p></div>' +
       '<button type="button" class="bouton" data-acheter="' + article + '"' + (raison ? ' disabled' : '') + '>' +
-      (raison || prix + ' pucerons') + '</button></article>';
+      (raison || Cocci.Icones.montant(prix)) + '</button></article>';
   }
 
   function afficher() {
     var html = '<div class="fiche-entete"><h2 id="boutique-titre">Boutique</h2>' +
       '<button type="button" class="bouton-fermer" data-fermer aria-label="Fermer la boutique">×</button></div>' +
-      '<p class="boutique-solde">Tu as <strong>' + etat().pucerons + ' pucerons</strong> · ' +
+      '<p class="boutique-solde">Tu as <strong>' + Cocci.Icones.montant(etat().pieces) + '</strong> · ' +
       E.placesLibres(etat()) + ' place' + (E.placesLibres(etat()) > 1 ? 's' : '') + ' libre' + (E.placesLibres(etat()) > 1 ? 's' : '') + '</p>';
 
     if (dernierAchat && dernierAchat.coccinelle) {
       html += '<div class="achat">' + '<p><strong>Tu as obtenu :</strong></p>' +
         UI.carteGenes(dernierAchat.coccinelle.genes, { taille: 100 }) +
-        (dernierAchat.nouvelle ? '<p class="pastille-texte">Nouvelle combinaison ! +' + CONFIG.ECONOMIE.RECOMPENSE_DECOUVERTE + ' pucerons</p>' : '') +
+        (dernierAchat.nouvelle ? '<p class="pastille-texte">Nouvelle combinaison ! +' + Cocci.Icones.montant(CONFIG.ECONOMIE.RECOMPENSE_DECOUVERTE) + '</p>' : '') +
         '</div>';
     }
 

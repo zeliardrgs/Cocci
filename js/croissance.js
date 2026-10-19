@@ -57,7 +57,7 @@ Cocci.Croissance = (function () {
   /* Fait avancer toutes les coccinelles jusqu'à « maintenant ».
      Renvoie la liste des changements : { coccinelle, de, vers, nouvelle }
      nouvelle = true si c'est la première fois qu'on voit cette combinaison
-     (le bonus de découverte est alors déjà ajouté aux pucerons).       */
+     (le bonus de découverte est alors déjà ajouté aux pièces d'or).       */
   function mettreAJour(etat, maintenant) {
     maintenant = maintenant || T.maintenant();
     var changements = [];
@@ -70,7 +70,7 @@ Cocci.Croissance = (function () {
       c.stade = nouveau;
       if (nouveau === 'adulte') {
         c.adulteDepuis = momentAdulte(c);
-        // ajout au Coccidex (+ bonus de pucerons si c'est une première)
+        // ajout au Coccidex (+ bonus de pièces d'or si c'est une première)
         changement.nouvelle = Cocci.Economie.decouvrir(etat, c.genes, c.adulteDepuis);
       }
       changements.push(changement);

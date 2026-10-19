@@ -130,7 +130,7 @@ Cocci.Missions = (function () {
   }
 
   /* ---------- Donner une coccinelle ----------
-     Renvoie { pucerons, sauvage, sauvageNouvelle } ou null si impossible. */
+     Renvoie { pieces, sauvage, sauvageNouvelle } ou null si impossible. */
   function donner(etat, index, idCoccinelle) {
     var mission = etat.missions[index];
     var c = etat.coccinelles.find(function (x) { return x.id === idCoccinelle; });
@@ -138,8 +138,8 @@ Cocci.Missions = (function () {
 
     var n = niveau(index);
     etat.coccinelles.splice(etat.coccinelles.indexOf(c), 1);
-    etat.pucerons += n.pucerons;
-    var resultat = { pucerons: n.pucerons, sauvage: null, sauvageNouvelle: false };
+    etat.pieces += n.pieces;
+    var resultat = { pieces: n.pieces, sauvage: null, sauvageNouvelle: false };
 
     if (n.sauvage) {
       // la coccinelle donnée libère une place : la sauvage peut la prendre

@@ -7,18 +7,13 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- ===== En-tête : titre + compteur de pucerons ===== -->
+  <!-- ===== En-tête : titre + compteur de pièces d'or ===== -->
   <header class="entete">
     <h1><span id="titre-jeu">Coccinelles</span> <span id="badge-test" class="badge-test" hidden>Mode test</span></h1>
-    <button type="button" id="bouton-boutique" class="pucerons" aria-label="Pucerons — ouvrir la boutique">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-        <ellipse cx="13" cy="13" rx="8" ry="6" fill="#9fe07a"/>
-        <circle cx="5.5" cy="10.5" r="3.2" fill="#7cc95a"/>
-        <circle cx="4.6" cy="9.8" r="0.9" fill="#2f3a2f"/>
-        <path d="M9 18l-1 3M13 19v3M17 18l1 3" stroke="#5aa05a" stroke-width="1.4" stroke-linecap="round"/>
-      </svg>
-      <span id="compteur-pucerons">0</span>
-      <span class="pucerons-boutique">Boutique</span>
+    <button type="button" id="bouton-boutique" class="porte-monnaie" aria-label="Pièces d'or — ouvrir la boutique">
+      <svg class="icone-piece" width="24" height="26" aria-hidden="true"><use href="#icone-piece"/></svg>
+      <span id="compteur-pieces">0</span>
+      <span class="porte-monnaie-boutique">Boutique</span>
     </button>
   </header>
 
@@ -147,6 +142,7 @@
 
   <!-- L'ordre compte : réglages, puis règles du jeu, puis affichage, puis démarrage -->
   <script src="js/config.js"></script>
+  <script src="js/icones.js"></script>
   <script src="js/temps.js"></script>
   <script src="js/genetique.js"></script>
   <script src="js/dessin.js"></script>

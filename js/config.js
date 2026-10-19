@@ -130,12 +130,12 @@ Cocci.CONFIG = {
     nymphe: { commune: 16, peuCommune: 19, rare: 22, epique: 30, legendaire: 36 }
   },
 
-  /* ---------- ÉCONOMIE (monnaie : pucerons) ---------- */
+  /* ---------- ÉCONOMIE (monnaie : pièces d'or) ---------- */
   ECONOMIE: {
     // Prix de vente d'un adulte selon sa rareté globale
     PRIX_VENTE: { commune: 5, peuCommune: 15, rare: 40, epique: 100, legendaire: 300 },
 
-    // Bonus quand une combinaison est vue pour la première fois
+    // Bonus (en pièces d'or) quand une combinaison est vue pour la première fois
     RECOMPENSE_DECOUVERTE: 10,
 
     BOUTIQUE: {
@@ -157,9 +157,9 @@ Cocci.CONFIG = {
     DELAI_REMPLACEMENT_HEURES: 4, // une mission accomplie ou refusée revient 4 h plus tard
     NB_CROISEMENTS_MAX: 2,        // les gènes demandés s'obtiennent en 2 croisements maximum
     NIVEAUX: [
-      { id: 'facile',    nom: 'Facile',    nbGenes: 1, rareteMin: 1, rareteMax: 2, pucerons: 20,  sauvage: false },
-      { id: 'moyenne',   nom: 'Moyenne',   nbGenes: 2, rareteMin: 1, rareteMax: 3, pucerons: 60,  sauvage: false },
-      { id: 'difficile', nom: 'Difficile', nbGenes: 3, rareteMin: 1, rareteMax: 4, pucerons: 200, sauvage: true }
+      { id: 'facile',    nom: 'Facile',    nbGenes: 1, rareteMin: 1, rareteMax: 2, pieces: 20,   sauvage: false },
+      { id: 'moyenne',   nom: 'Moyenne',   nbGenes: 2, rareteMin: 1, rareteMax: 3, pieces: 60,   sauvage: false },
+      { id: 'difficile', nom: 'Difficile', nbGenes: 3, rareteMin: 1, rareteMax: 4, pieces: 200,  sauvage: true }
     ]
   },
 
@@ -169,7 +169,7 @@ Cocci.CONFIG = {
 
   /* ---------- DÉPART D'UNE NOUVELLE PARTIE ---------- */
   DEPART: {
-    pucerons: 50,
+    pieces: 50,     // pièces d'or au départ
     places: 6,
     coccinelles: [
       { carapace: 'ruby',  motif: 'pois',    couleurMotif: 'coal' },   // rouge à pois noirs

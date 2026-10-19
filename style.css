@@ -55,7 +55,7 @@ body {
 }
 .entete h1 { margin: 0; font-size: 1.4rem; }
 #titre-jeu { cursor: default; user-select: none; }
-.pucerons {
+.porte-monnaie {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -517,10 +517,10 @@ button.carte-croissance { cursor: pointer; }
 /* =========================================================
    ÉTAPE 5 — Boutique et missions
    ========================================================= */
-button.pucerons { border: none; color: #fff; font-family: inherit; cursor: pointer; }
-button.pucerons:hover { background: rgba(255, 255, 255, 0.32); }
-button.pucerons:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
-.pucerons-boutique {
+button.porte-monnaie { border: none; color: #fff; font-family: inherit; cursor: pointer; }
+button.porte-monnaie:hover { background: rgba(255, 255, 255, 0.32); }
+button.porte-monnaie:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
+.porte-monnaie-boutique {
   font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -650,3 +650,7 @@ button.pucerons:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px;
   .naissance, .annonce, .achat, .fiche[open] { animation: none; }
   .barre-remplie { transition: none; }
 }
+
+/* ---------- Pièces d'or ---------- */
+.icone-piece { display: inline-block; vertical-align: -0.2em; flex-shrink: 0; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2)); }
+.montant { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; font-weight: 800; }

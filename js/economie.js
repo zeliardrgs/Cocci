@@ -1,5 +1,5 @@
 /* =========================================================
-   ECONOMIE.JS — Pucerons, places d'élevage, ventes, boutique,
+   ECONOMIE.JS — Pièces d'or, places d'élevage, ventes, boutique,
    et bonus de première découverte.
    Tous les prix se règlent dans config.js (ECONOMIE).
    ========================================================= */
@@ -22,13 +22,13 @@ Cocci.Economie = (function () {
 
   /* ---------- Découvertes ---------- */
 
-  // Note une combinaison dans le Coccidex. Si c'est une première : bonus de pucerons.
+  // Note une combinaison dans le Coccidex. Si c'est une première : bonus de pièces d'or.
   // Renvoie true si c'était une nouvelle combinaison.
   function decouvrir(etat, genes, moment) {
     var cle = G.cle(genes);
     if (etat.coccidex[cle]) return false;
     etat.coccidex[cle] = moment || Cocci.Temps.maintenant();
-    etat.pucerons += ECO.RECOMPENSE_DECOUVERTE;
+    etat.pieces += ECO.RECOMPENSE_DECOUVERTE;
     return true;
   }
 
@@ -39,14 +39,14 @@ Cocci.Economie = (function () {
     return ECO.PRIX_VENTE[G.rareteGlobale(c.genes).id];
   }
 
-  // Vend un adulte : il quitte l'élevage, les pucerons sont ajoutés.
+  // Vend un adulte : il quitte l'élevage, les pièces d'or sont ajoutées.
   // Renvoie le prix obtenu (0 si la vente est impossible).
   function vendre(etat, id) {
     var i = etat.coccinelles.findIndex(function (c) { return c.id === id; });
     if (i < 0 || etat.coccinelles[i].stade !== 'adulte') return 0;
     var prix = prixVente(etat.coccinelles[i]);
     etat.coccinelles.splice(i, 1);
-    etat.pucerons += prix;
+    etat.pieces += prix;
     return prix;
   }
 
@@ -88,7 +88,7 @@ Cocci.Economie = (function () {
   // Raison pour laquelle on ne peut pas acheter (ou null si c'est possible)
   function empechementAchat(etat, article) {
     if (article !== 'place' && !placesLibres(etat)) return 'Élevage plein';
-    if (etat.pucerons < prix(etat, article)) return 'Pas assez de pucerons';
+    if (etat.pieces < prix(etat, article)) return 'Pas assez de pièces d’or';
     return null;
   }
 
@@ -96,7 +96,7 @@ Cocci.Economie = (function () {
   // { place: true } pour une place, ou null si l'achat est impossible.
   function acheter(etat, article) {
     if (empechementAchat(etat, article)) return null;
-    etat.pucerons -= prix(etat, article);
+    etat.pieces -= prix(etat, article);
     if (article === 'place') {
       etat.places += 1;
       etat.placesAchetees += 1;

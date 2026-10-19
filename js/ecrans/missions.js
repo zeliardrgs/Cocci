@@ -21,7 +21,7 @@ Cocci.Ecrans.missions = (function () {
   function etat() { return Cocci.Jeu.etat; }
 
   function texteRecompense(n) {
-    return '<strong>' + n.pucerons + ' pucerons</strong>' + (n.sauvage ? ' + 1 coccinelle sauvage' : '');
+    return '<strong>' + Cocci.Icones.montant(n.pieces) + '</strong>' + (n.sauvage ? ' + 1 coccinelle sauvage' : '');
   }
 
   function ligneGene(demande, type) {
@@ -123,11 +123,11 @@ Cocci.Ecrans.missions = (function () {
       delete enCours[i];
       if (r) {
         Cocci.Jeu.enregistrer();
-        UI.annoncer('Mission accomplie ! <strong>+' + r.pucerons + ' pucerons</strong>');
+        UI.annoncer('Mission accomplie ! <strong>+' + Cocci.Icones.montant(r.pieces) + '</strong>');
         if (r.sauvage) {
           Cocci.Jeu.dernierNe = r.sauvage.id;
           UI.annoncer('Une coccinelle sauvage rejoint ton élevage : <strong>' + G.nom(r.sauvage.genes) + '</strong>' +
-            (r.sauvageNouvelle ? '<br>Nouvelle combinaison ! +' + CONFIG.ECONOMIE.RECOMPENSE_DECOUVERTE + ' pucerons' : ''), r.sauvageNouvelle);
+            (r.sauvageNouvelle ? '<br>Nouvelle combinaison ! +' + Cocci.Icones.montant(CONFIG.ECONOMIE.RECOMPENSE_DECOUVERTE) : ''), r.sauvageNouvelle);
         }
       }
     }
