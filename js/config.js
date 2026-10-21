@@ -212,7 +212,8 @@ Cocci.CONFIG = {
   COULEUR_CORPS: '#333333',       // tête et antennes
   COULEUR_COLLERETTE: '#EAC791',  // partie claire entre la tête et la carapace
   COULEUR_SILHOUETTE: '#cfdcc6',  // coccinelle pas encore choisie / pas découverte
-  COULEUR_OEUF: '#fff1c7',
+  COULEUR_OEUF: '#CFE8F7',         // œuf : bleu très pâle
+  COULEUR_OEUF_OMBRE: '#8DBAD8',   // ombre de l'œuf
   COULEUR_INCONNUE: '#c9d3c2',     // carapace « ? » sur les missions
   COULEUR_MOTIF_INCONNU: '#8b9588' // couleur de motif « ? » sur les missions
 };

@@ -232,13 +232,17 @@ Cocci.Dessin = (function () {
   // Œuf : aucun indice, les gènes sont cachés
   function oeuf(options) {
     options = options || {};
+    // un œuf presque rond, bleuté et légèrement nacré
     return cadre(options.taille || 120, 'Œuf de coccinelle',
       OMBRE_SOL +
-      '<path d="M69 40C98 40 110 98 108 124C106 152 90 166 69 166C48 166 32 152 30 124C28 98 40 40 69 40Z" ' +
-      'fill="' + CONFIG.COULEUR_OEUF + '"/>' +
-      '<path d="M69 166C90 166 106 152 108 124C108 118 107 111 106 104C104 140 88 156 66 156C52 156 40 150 33 140C38 156 52 166 69 166Z" ' +
-      'fill="black" opacity="0.08"/>' +
-      '<ellipse cx="54" cy="78" rx="8" ry="15" transform="rotate(20 54 78)" fill="white" opacity="0.7"/>');
+      '<g transform="translate(69 167) scale(1.2) translate(-69 -167)">' +
+      '<ellipse cx="69" cy="122" rx="42" ry="45" fill="' + CONFIG.COULEUR_OEUF + '"/>' +
+      // ombre douce en bas à droite
+      '<path d="M111 122 A42 45 0 0 1 69 167 A42 45 0 0 1 32 145 C46 156 76 160 96 144 C106 136 110 128 111 122Z" ' +
+      'fill="' + CONFIG.COULEUR_OEUF_OMBRE + '" opacity="0.55"/>' +
+      // reflets
+      '<ellipse cx="53" cy="100" rx="11" ry="15" transform="rotate(25 53 100)" fill="white" opacity="0.75"/>' +
+      '<circle cx="74" cy="92" r="4" fill="white" opacity="0.6"/></g>');
   }
 
   // Petite coccinelle : exactement l'adulte, en plus petit (posée en bas du cadre)
